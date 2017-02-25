@@ -13,6 +13,8 @@ public class Car {
     private Vector2 velocity;
     private Vector2 acceleration;
     private float rotation;
+    private float originalY;
+
     private int width;
     private int height;
     private Circle boundingCircle;
@@ -21,6 +23,7 @@ public class Car {
     public Car(int x, int y, int width, int height) {
         this.height = height;
         this.width = width;
+        this.originalY = y;
         position = new Vector2(x, y);
         velocity = new Vector2(0, 0);
         acceleration = new Vector2(0, 460);
@@ -53,6 +56,10 @@ public class Car {
             if (rotation > 90)
                 rotation = 90;
         }
+    }
+
+    public void updateReady(float runTime) {
+        position.y = 2 * (float) Math.sin(7 * runTime) + originalY;
     }
 
     public boolean isFalling() {

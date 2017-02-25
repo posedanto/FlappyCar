@@ -55,6 +55,19 @@ public class ScrollHandler {
         }
     }
 
+    public void updateReady(float delta) {
+        frontGrass.update(delta);
+        backGrass.update(delta);
+
+        if (frontGrass.isScrolledLeft()) {
+            frontGrass.reset(backGrass.getTailX());
+
+        } else if (backGrass.isScrolledLeft()) {
+            backGrass.reset(frontGrass.getTailX());
+
+        }
+    }
+
     public void stop() {
         frontGrass.stop();
         backGrass.stop();

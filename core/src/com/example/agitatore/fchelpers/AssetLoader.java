@@ -13,8 +13,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  */
 
 public class AssetLoader {
-    public static Texture texture;
-    public static TextureRegion bg, grass;
+    public static Texture texture, logoTexture;
+    public static TextureRegion bg, grass, logo, fcLogo, playButtonUp, playButtonDown;
     public static Animation carAnimation;
     public static TextureRegion car, carDown, carUp;
     public static TextureRegion tube, tubeDown, tubeUp;
@@ -30,8 +30,21 @@ public class AssetLoader {
         if (!prefs.contains("highScore"))
             prefs.putInteger("highScore", 0);
 
+        logoTexture = new Texture(Gdx.files.internal("logo.png"));
+        logoTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        logo = new TextureRegion(logoTexture, 0, 0, 512, 114);
+
         texture = new Texture(Gdx.files.internal("texture.png"));
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
+        fcLogo = new TextureRegion(texture, 0, 55, 135, 24);
+        fcLogo.flip(false, true);
+
+        playButtonUp = new TextureRegion(texture, 0, 83, 29, 16);
+        playButtonDown = new TextureRegion(texture, 29, 83, 29, 16);
+        playButtonUp.flip(false, true);
+        playButtonDown.flip(false, true);
 
         bg = new TextureRegion(texture, 0, 0, 136, 43);
         bg.flip(false, true);
@@ -81,9 +94,12 @@ public class AssetLoader {
     }
 
     public static void dispose() {
+        logoTexture.dispose();
         texture.dispose();
         dead.dispose();
         flap.dispose();
         coin.dispose();
+        font.dispose();
+        shadow.dispose();
     }
 }

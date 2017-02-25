@@ -20,11 +20,12 @@ public class GameWorld {
 
     private int score = 0;
     public int midPointY;
+    private float runTime = 0;
 
     private GameState currentState;
 
     public enum GameState {
-        READY, RUNNING, GAMEOVER, HIGHSCORE
+        MENU, READY, RUNNING, GAMEOVER, HIGHSCORE
     }
 
     public GameWorld(int midPointY) {
@@ -32,12 +33,14 @@ public class GameWorld {
         this.midPointY = midPointY;
         car = new Car(33, midPointY - 5, 17, 12);
         scroller = new ScrollHandler(this, midPointY + 66);
-        ground = new Rectangle(0, midPointY + 66, 136, 11);
+        ground = new Rectangle(0, midPointY + 66, 136, 11); //137-136?
     }
 
     public void update(float delta) {
+        runTime += delta;
         switch (currentState) {
             case READY:
+            case MENU:
                 updateReady(delta);
                 break;
             case RUNNING:
@@ -49,7 +52,8 @@ public class GameWorld {
     }
 
     public void updateReady(float delta) {
-
+        car.updateReady(runTime);
+        scroller.updateReady(delta);
     }
 
     public void updateRunning(float delta) {
@@ -105,6 +109,10 @@ public class GameWorld {
         currentState = GameState.RUNNING;
     }
 
+    public void ready() {
+        currentState = GameState.READY;
+    }
+
     public void restart() {
         //currentState = GameState.READY;
         score = 0;
@@ -113,11 +121,23 @@ public class GameWorld {
         currentState = GameState.READY;
     }
 
+    public int getMidPointY() {
+        return midPointY;
+    }
+
     public boolean isGameOver() {
         return currentState == GameState.GAMEOVER;
     }
 
     public boolean isHighScore() {
         return currentState == GameState.HIGHSCORE;
+    }
+
+    public boolean isMenu() {
+        return currentState == GameState.MENU;
+    }
+
+    public boolean isRunning() {
+        return currentState == GameState.RUNNING;
     }
 }

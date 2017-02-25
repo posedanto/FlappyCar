@@ -8,11 +8,21 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.example.agitatore.TweenAccessors.Value;
+import com.example.agitatore.TweenAccessors.ValueAccessor;
 import com.example.agitatore.fchelpers.AssetLoader;
+import com.example.agitatore.fchelpers.InputHandler;
 import com.example.agitatore.gameobjects.Car;
 import com.example.agitatore.gameobjects.Grass;
 import com.example.agitatore.gameobjects.Pipe;
 import com.example.agitatore.gameobjects.ScrollHandler;
+import com.example.agitatore.ui.SimpleButton;
+
+import java.util.List;
+
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenEquations;
+import aurelienribon.tweenengine.TweenManager;
 
 /**
  * Created by Agitatore on 19.02.2017.
@@ -25,7 +35,6 @@ public class GameRenderer {
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
 
-    private int gameHeight;
     private int midPointY;
 
     // Game Objects
@@ -37,13 +46,21 @@ public class GameRenderer {
     // Game Assets
     private TextureRegion bg, grass;
     private Animation carAnimation;
-    private TextureRegion carMid, carDown, carUp;
+    private TextureRegion carMid;
     private TextureRegion tubeUp, tubeDown, tube;
 
-    public GameRenderer(GameWorld world, int gameHeight, int midPointY) {
+    private TweenManager manager;
+    private Value alpha = new Value();
+
+    private List<SimpleButton> menuButtons;
+
+    public GameRenderer(GameWorld world, int gameHeight, int midPointY) { //gameHeight удалить?
         myWorld = world;
-        this.gameHeight = gameHeight;
         this.midPointY = midPointY;
+
+        this.menuButtons = ((InputHandler) Gdx.input.getInputProcessor())
+                .getMenuButtons();
+
         camera = new OrthographicCamera();
         camera.setToOrtho(true, 136, gameHeight);
         batch = new SpriteBatch();
@@ -54,6 +71,14 @@ public class GameRenderer {
 
         initGameObjects();
         initAssets();
+        setupTweens();
+    }
+
+    private void setupTweens() {
+        Tween.registerAccessor(Value.class, new ValueAccessor());
+        manager = new TweenManager();
+        Tween.to(alpha, -1, .5f).target(0).ease(TweenEquations.easeOutQuad)
+                .start(manager);
     }
 
     private void initGameObjects() {
@@ -71,14 +96,12 @@ public class GameRenderer {
         grass = AssetLoader.grass;
         carAnimation = AssetLoader.carAnimation;
         carMid = AssetLoader.car;
-        carDown = AssetLoader.carDown;
-        carUp = AssetLoader.carUp;
         tubeUp = AssetLoader.tubeUp;
         tubeDown = AssetLoader.tubeDown;
         tube = AssetLoader.tube;
     }
 
-    public void render(float runTime) {
+    public void render(float delta, float runTime) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -113,70 +136,26 @@ public class GameRenderer {
         batch.enableBlending();
 
         drawSkulls();
-        if (car.shouldntFlap()) {
-            batch.draw(carMid, car.getPosition().x, car.getPosition().y,
-                    car.getWidth() / 2.0f, car.getHeight() / 2.0f,
-                    car.getWidth(), car.getHeight(), 1, 1, car.getRotation());
 
-        } else {
-            batch.draw((TextureRegion) carAnimation.getKeyFrame(runTime), car.getPosition().x,
-                    car.getPosition().y, car.getWidth() / 2.0f,
-                    car.getHeight() / 2.0f, car.getWidth(), car.getHeight(),
-                    1, 1, car.getRotation());
+        if (myWorld.isRunning()) {
+            drawBird(runTime);
+            drawScore();
+        } else if (myWorld.isReady()) {
+            drawBird(runTime);
+            drawScore();
+        } else if (myWorld.isMenu()) {
+            drawBirdCentered(runTime);
+            drawMenuUI();
+        } else if (myWorld.isGameOver()) {
+            drawBird(runTime);
+            drawScore();
+        } else if (myWorld.isHighScore()) {
+            drawBird(runTime);
+            drawScore();
         }
-
-        // ВРЕМЕННЫЙ КОД! Исправим чуть позже!
-
-        if (myWorld.isReady()) {
-            // Отрисуем сначала тень
-            AssetLoader.shadow.draw(batch, "Touch me", (136 / 2) - (42), 76);
-            // А теперь сам текст
-            AssetLoader.font
-                    .draw(batch, "Touch me", (136 / 2) - (42 - 1), 75);
-        } else {
-
-            if (myWorld.isGameOver() || myWorld.isHighScore()) {
-
-                if (myWorld.isGameOver()) {
-                    AssetLoader.shadow.draw(batch, "Game Over", 25, 56);
-                    AssetLoader.font.draw(batch, "Game Over", 24, 55);
-
-                    AssetLoader.shadow.draw(batch, "High Score:", 23, 106);
-                    AssetLoader.font.draw(batch, "High Score:", 22, 105);
-
-                    String highScore = AssetLoader.getHighScore() + "";
-
-                    AssetLoader.shadow.draw(batch, highScore, (136 / 2)
-                            - (3 * highScore.length()), 128);
-                    AssetLoader.font.draw(batch, highScore, (136 / 2)
-                            - (3 * highScore.length() - 1), 127);
-                } else {
-                    AssetLoader.shadow.draw(batch, "High Score!", 19, 56);
-                    AssetLoader.font.draw(batch, "High Score!", 18, 55);
-                }
-
-                AssetLoader.shadow.draw(batch, "Try again?", 23, 76);
-                AssetLoader.font.draw(batch, "Try again?", 24, 75);
-
-                // Конвертируем integer в String
-                String score = myWorld.getScore() + "";
-
-                AssetLoader.shadow.draw(batch, score,
-                        (136 / 2) - (3 * score.length()), 12);
-                AssetLoader.font.draw(batch, score,
-                        (136 / 2) - (3 * score.length() - 1), 11);
-
-            }
-        }
-
-        String score = myWorld.getScore() + "";
-
-        AssetLoader.shadow.draw(batch, "" + myWorld.getScore(), (136 / 2)
-                - (3 * score.length()), 12);
-        AssetLoader.font.draw(batch, "" + myWorld.getScore(), (136 / 2)
-                - (3 * score.length() - 1), 11);
 
         batch.end();
+        drawTransition(delta);
 
         /*shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.RED);
@@ -263,5 +242,60 @@ public class GameRenderer {
                 pipe3.getHeight());
         batch.draw(tube, pipe3.getPosition().x, pipe3.getPosition().y + pipe3.getHeight() + 45,
                 pipe3.getWidth(), midPointY + 66 - (pipe3.getHeight() + 45));
+    }
+
+    private void drawBirdCentered(float runTime) {
+        batch.draw((TextureRegion) carAnimation.getKeyFrame(runTime), 59, car.getPosition().y - 15,
+                car.getWidth() / 2.0f, car.getHeight() / 2.0f,
+                car.getWidth(), car.getHeight(), 1, 1, car.getRotation());
+    }
+
+    private void drawBird(float runTime) {
+
+        if (car.shouldntFlap()) {
+            batch.draw(carMid, car.getPosition().x, car.getPosition().y,
+                    car.getWidth() / 2.0f, car.getHeight() / 2.0f,
+                    car.getWidth(), car.getHeight(), 1, 1, car.getRotation());
+
+        } else {
+            batch.draw((TextureRegion) carAnimation.getKeyFrame(runTime), car.getPosition().x,
+                    car.getPosition().y, car.getWidth() / 2.0f,
+                    car.getHeight() / 2.0f, car.getWidth(), car.getHeight(),
+                    1, 1, car.getRotation());
+        }
+
+    }
+
+    private void drawMenuUI() {
+        batch.draw(AssetLoader.fcLogo, 136 / 2 - 56, midPointY - 50,
+                AssetLoader.fcLogo.getRegionWidth() / 1.2f,
+                AssetLoader.fcLogo.getRegionHeight() / 1.2f);
+
+        for (SimpleButton button : menuButtons) {
+            button.draw(batch);
+        }
+
+    }
+
+    private void drawScore() {
+        int length = ("" + myWorld.getScore()).length();
+        AssetLoader.shadow.draw(batch, "" + myWorld.getScore(),
+                68 - (3 * length), midPointY - 82);
+        AssetLoader.font.draw(batch, "" + myWorld.getScore(),
+                68 - (3 * length), midPointY - 83);
+    }
+
+    private void drawTransition(float delta) {
+        if (alpha.getValue() > 0) {
+            manager.update(delta);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(1, 1, 1, alpha.getValue());
+            shapeRenderer.rect(0, 0, 136, 300);
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        }
     }
 }
