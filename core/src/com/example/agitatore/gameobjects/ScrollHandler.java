@@ -18,12 +18,15 @@ public class ScrollHandler {
 
     public ScrollHandler(GameWorld gameWorld, float yPos) {
         this.gameWorld = gameWorld;
-        frontGrass = new Grass(0, yPos, 143, 11, SCROLL_SPEED);
-        backGrass = new Grass(frontGrass.getTailX(), yPos, 143, 11, SCROLL_SPEED);
+        //frontGrass = new Grass(0, yPos, 143, 11, SCROLL_SPEED);
+        //backGrass = new Grass(frontGrass.getTailX(), yPos, 143, 11, SCROLL_SPEED);
+        frontGrass = new Grass(0, yPos, 165, 11, SCROLL_SPEED);
+        backGrass = new Grass(frontGrass.getTailX(), yPos, 165, 11, SCROLL_SPEED);
 
-        pipe1 = new Pipe(210, 0, 22, 60, SCROLL_SPEED, yPos);
-        pipe2 = new Pipe(pipe1.getTailX() + PIPE_GAP, 0, 22, 70, SCROLL_SPEED, yPos);
-        pipe3 = new Pipe(pipe2.getTailX() + PIPE_GAP, 0, 22, 60, SCROLL_SPEED, yPos);
+        //pipe1 = new Pipe(210, 0, 22, 60, SCROLL_SPEED, yPos);
+        pipe1 = new Pipe(210, 0, 10, 60, SCROLL_SPEED, yPos);
+        pipe2 = new Pipe(pipe1.getTailX() + PIPE_GAP, 0, 10, 70, SCROLL_SPEED, yPos);
+        pipe3 = new Pipe(pipe2.getTailX() + PIPE_GAP, 0, 10, 60, SCROLL_SPEED, yPos);
     }
 
     public void update(float delta) {
@@ -82,20 +85,20 @@ public class ScrollHandler {
                 + car.getWidth()) {
             addScore(1);
             pipe1.setScored(true);
-            AssetLoader.coin.play();
+            //AssetLoader.coin.play();  раскоментить
         } else if (!pipe2.isScored()
                 && pipe2.getPosition().x + (pipe2.getWidth() / 2) < car.getPosition().x
                 + car.getWidth()) {
             addScore(1);
             pipe2.setScored(true);
-            AssetLoader.coin.play();
+            //AssetLoader.coin.play();
 
         } else if (!pipe3.isScored()
                 && pipe3.getPosition().x + (pipe3.getWidth() / 2) < car.getPosition().x
                 + car.getWidth()) {
             addScore(1);
             pipe3.setScored(true);
-            AssetLoader.coin.play();
+            //AssetLoader.coin.play();
         }
         return (pipe1.collides(car) || pipe2.collides(car) || pipe3.collides(car));
     }

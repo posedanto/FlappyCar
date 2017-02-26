@@ -109,15 +109,15 @@ public class GameRenderer {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         // Отрисуем Background цвет
-        shapeRenderer.setColor(55 / 255.0f, 80 / 255.0f, 100 / 255.0f, 1);
+        shapeRenderer.setColor(149 / 255.0f, 233 / 255.0f, 252 / 255.0f, 1);
         shapeRenderer.rect(0, 0, 136, midPointY + 66);
 
-        // Отрисуем Grass
+        /*// Отрисуем Grass
         shapeRenderer.setColor(111 / 255.0f, 186 / 255.0f, 45 / 255.0f, 1);
-        shapeRenderer.rect(0, midPointY + 66, 136, 11);
+        shapeRenderer.rect(0, midPointY + 66, 136, 11);*/
 
         // Отрисуем Dirt
-        shapeRenderer.setColor(147 / 255.0f, 80 / 255.0f, 27 / 255.0f, 1);
+        shapeRenderer.setColor(158 / 255.0f, 146 / 255.0f, 141 / 255.0f, 1);
         shapeRenderer.rect(0, midPointY + 77, 136, 52);
 
         // Заканчиваем ShapeRenderer
@@ -128,7 +128,8 @@ public class GameRenderer {
         // Отменим прозрачность
         // Это хорошо для производительности, когда отрисовываем картинки без прозрачности
         batch.disableBlending();
-        batch.draw(bg, 0, midPointY + 23, 136, 43);
+        //batch.draw(bg, 0, midPointY + 23, 136, 43);
+        batch.draw(bg, 0, midPointY + 6, 136, 60);
 
         drawGrass();
 
@@ -157,7 +158,7 @@ public class GameRenderer {
         batch.end();
         drawTransition(delta);
 
-        /*shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        /*shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.circle(car.getBoundingCircle().x, car.getBoundingCircle().y, car.getBoundingCircle().radius);
 
@@ -209,38 +210,42 @@ public class GameRenderer {
         // Временный код, извините за кашу :)
         // Мы это починим, как только закончим с Pipe классом.
 
-        batch.draw(tubeUp, pipe1.getPosition().x - 1,
-                pipe1.getPosition().y + pipe1.getHeight() - 14, 24, 14);
-        batch.draw(tubeDown, pipe1.getPosition().x - 1,
-                pipe1.getPosition().y + pipe1.getHeight() + 45, 24, 14);
+        //batch.draw(tubeUp, pipe1.getPosition().x - 1,
+        //        pipe1.getPosition().y + pipe1.getHeight() - 14, 24, 14);
+        batch.draw(tubeUp, pipe1.getPosition().x - 5,
+                pipe1.getPosition().y + pipe1.getHeight() - 36, 28, 36);
+        batch.draw(tubeDown, pipe1.getPosition().x,
+                pipe1.getPosition().y + pipe1.getHeight() + 45, 18, 34);
+        //batch.draw(tubeDown, pipe1.getPosition().x - 1,
+        //        pipe1.getPosition().y + pipe1.getHeight() + 45, 24, 14);
 
-        batch.draw(tubeUp, pipe2.getPosition().x - 1,
-                pipe2.getPosition().y + pipe2.getHeight() - 14, 24, 14);
-        batch.draw(tubeDown, pipe2.getPosition().x - 1,
-                pipe2.getPosition().y + pipe2.getHeight() + 45, 24, 14);
+        batch.draw(tubeUp, pipe2.getPosition().x - 5,
+                pipe2.getPosition().y + pipe2.getHeight() - 36, 28, 36);
+        batch.draw(tubeDown, pipe2.getPosition().x,
+                pipe2.getPosition().y + pipe2.getHeight() + 45, 18, 34);
 
-        batch.draw(tubeUp, pipe3.getPosition().x - 1,
-                pipe3.getPosition().y + pipe3.getHeight() - 14, 24, 14);
-        batch.draw(tubeDown, pipe3.getPosition().x - 1,
-                pipe3.getPosition().y + pipe3.getHeight() + 45, 24, 14);
+        batch.draw(tubeUp, pipe3.getPosition().x - 5,
+                pipe3.getPosition().y + pipe3.getHeight() - 36, 28, 36);
+        batch.draw(tubeDown, pipe3.getPosition().x,
+                pipe3.getPosition().y + pipe3.getHeight() + 45, 18, 34);
     }
 
     private void drawPipes() {
         // Временный код, извините за кашу :)
         // Мы это починим, как только закончим с Pipe классом.
-        batch.draw(tube, pipe1.getPosition().x, pipe1.getPosition().y, pipe1.getWidth(),
+        batch.draw(tube, pipe1.getPosition().x + 4, pipe1.getPosition().y, pipe1.getWidth(),
                 pipe1.getHeight());
-        batch.draw(tube, pipe1.getPosition().x, pipe1.getPosition().y + pipe1.getHeight() + 45,
+        batch.draw(tube, pipe1.getPosition().x + 4, pipe1.getPosition().y + pipe1.getHeight() + 45,
                 pipe1.getWidth(), midPointY + 66 - (pipe1.getHeight() + 45));
 
-        batch.draw(tube, pipe2.getPosition().x, pipe2.getPosition().y, pipe2.getWidth(),
+        batch.draw(tube, pipe2.getPosition().x + 4, pipe2.getPosition().y, pipe2.getWidth(),
                 pipe2.getHeight());
-        batch.draw(tube, pipe2.getPosition().x, pipe2.getPosition().y + pipe2.getHeight() + 45,
+        batch.draw(tube, pipe2.getPosition().x + 4, pipe2.getPosition().y + pipe2.getHeight() + 45,
                 pipe2.getWidth(), midPointY + 66 - (pipe2.getHeight() + 45));
 
-        batch.draw(tube, pipe3.getPosition().x, pipe3.getPosition().y, pipe3.getWidth(),
+        batch.draw(tube, pipe3.getPosition().x + 4, pipe3.getPosition().y, pipe3.getWidth(),
                 pipe3.getHeight());
-        batch.draw(tube, pipe3.getPosition().x, pipe3.getPosition().y + pipe3.getHeight() + 45,
+        batch.draw(tube, pipe3.getPosition().x + 4, pipe3.getPosition().y + pipe3.getHeight() + 45,
                 pipe3.getWidth(), midPointY + 66 - (pipe3.getHeight() + 45));
     }
 

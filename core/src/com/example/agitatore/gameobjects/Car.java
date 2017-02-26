@@ -20,6 +20,8 @@ public class Car {
     private Circle boundingCircle;
     private boolean isAlive;
 
+    private float sin, cos;
+
     public Car(int x, int y, int width, int height) {
         this.height = height;
         this.width = width;
@@ -42,7 +44,10 @@ public class Car {
         }
         position.add(velocity.cpy().scl(delta));
 
-        boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
+        //boundingCircle.set(position.x + 9, position.y + 6, 6.5f);
+        sin = (float) Math.sin(Math.toRadians(rotation));
+        cos = (float) Math.cos(Math.toRadians(rotation));
+        boundingCircle.set(position.x + 9 - 3 * sin, position.y + 4 + 3 * cos, 7f);
 
         if (velocity.y < 0) {
             rotation -= 600 * delta;
@@ -90,6 +95,10 @@ public class Car {
     public void die() {
         isAlive = false;
         velocity.y = 0;
+    }
+
+    public boolean cleverCheck(int y) {
+        return boundingCircle.radius * Math.abs(sin) + boundingCircle.y > y-1;
     }
 
     public void decelerate() {

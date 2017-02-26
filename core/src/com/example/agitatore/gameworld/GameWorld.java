@@ -31,8 +31,10 @@ public class GameWorld {
     public GameWorld(int midPointY) {
         currentState = GameState.READY;
         this.midPointY = midPointY;
-        car = new Car(33, midPointY - 5, 17, 12);
+        //car = new Car(33, midPointY - 5, 17, 12);
+        car = new Car(33, midPointY - 5, 17, 8);
         scroller = new ScrollHandler(this, midPointY + 66);
+        //ground = new Rectangle(0, midPointY + 66, 136, 11); //137-136?
         ground = new Rectangle(0, midPointY + 66, 136, 11); //137-136?
     }
 
@@ -70,7 +72,9 @@ public class GameWorld {
             AssetLoader.dead.play();
         }
 
-        if (Intersector.overlaps(car.getBoundingCircle(), ground)) {
+        //if (Intersector.overlaps(car.getBoundingCircle(), ground)) {
+        if (Intersector.overlaps(car.getBoundingCircle(), ground) &&
+                car.cleverCheck(midPointY + 66)) {
             scroller.stop();
             car.die();
             car.decelerate();

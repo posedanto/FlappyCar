@@ -18,6 +18,10 @@ public class Pipe extends Scrollable {
     public static final int VERTICAL_GAP = 45;
     public static final int SKULL_WIDTH = 24;
     public static final int SKULL_HEIGHT = 11;
+    public static final int LIGHTDOWN_WIDTH = 18;
+    public static final int LIGHTDOWN_HEIGHT = 34;
+    public static final int LIGHTUP_WIDTH = 20;
+    public static final int LIGHTUP_HEIGHT = 36;
 
     private float groundY;
     private boolean isScored;
@@ -36,8 +40,8 @@ public class Pipe extends Scrollable {
     public void update(float delta) {
         super.update(delta);
 
-        barUp.set(position.x, position.y, width, height);
-        barDown.set(position.x, position.y + height + VERTICAL_GAP, width,
+        barUp.set(position.x + 4, position.y, width, height);
+        barDown.set(position.x + 4, position.y + height + VERTICAL_GAP, width,
                 groundY - (position.y + height + VERTICAL_GAP));
 
         // Ширина черепа 24 пикселя. Ширина трубы всего 22 пикселя. Так что череп
@@ -45,16 +49,17 @@ public class Pipe extends Scrollable {
         // относительно трубы).
 
         // Смещение равнозначно: (SKULL_WIDTH - width) / 2
-        tubeUp.set(position.x - (SKULL_WIDTH - width) / 2, position.y + height
-                - SKULL_HEIGHT, SKULL_WIDTH, SKULL_HEIGHT);
-        tubeDown.set(position.x - (SKULL_WIDTH - width) / 2, barDown.y,
-                SKULL_WIDTH, SKULL_HEIGHT);
+        tubeUp.set(position.x - 1, position.y + height
+                - LIGHTUP_HEIGHT, LIGHTUP_WIDTH, LIGHTUP_HEIGHT);
+        tubeDown.set(position.x , barDown.y,
+                LIGHTDOWN_WIDTH, LIGHTDOWN_HEIGHT);
     }
 
     @Override
     public void reset(float newX) {
         super.reset(newX);
-        height = r.nextInt(90) + 15;
+        //height = r.nextInt(90) + 15;
+        height = r.nextInt(51) + 37;
         isScored = false;
     }
 
@@ -70,9 +75,9 @@ public class Pipe extends Scrollable {
     public boolean collides(Car car) {
         if (position.x < car.getPosition().x + car.getWidth()) {
             return (Intersector.overlaps(car.getBoundingCircle(), barUp)
-                    || Intersector.overlaps(car.getBoundingCircle(), barDown)
-                    || Intersector.overlaps(car.getBoundingCircle(), tubeUp) || Intersector
-                    .overlaps(car.getBoundingCircle(), tubeDown));
+                    || Intersector.overlaps(car.getBoundingCircle(), tubeUp)
+                    || (car.cleverCheck((int) barDown.y) && (Intersector.overlaps(car.getBoundingCircle(), barDown)
+                    || Intersector.overlaps(car.getBoundingCircle(), tubeDown))));
         }
         return false;
     }
