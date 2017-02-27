@@ -85,20 +85,20 @@ public class ScrollHandler {
                 + car.getWidth()) {
             addScore(1);
             pipe1.setScored(true);
-            //AssetLoader.coin.play();  раскоментить
+            AssetLoader.coin.play();
         } else if (!pipe2.isScored()
                 && pipe2.getPosition().x + (pipe2.getWidth() / 2) < car.getPosition().x
                 + car.getWidth()) {
             addScore(1);
             pipe2.setScored(true);
-            //AssetLoader.coin.play();
+            AssetLoader.coin.play();
 
         } else if (!pipe3.isScored()
                 && pipe3.getPosition().x + (pipe3.getWidth() / 2) < car.getPosition().x
                 + car.getWidth()) {
             addScore(1);
             pipe3.setScored(true);
-            //AssetLoader.coin.play();
+            AssetLoader.coin.play();
         }
         return (pipe1.collides(car) || pipe2.collides(car) || pipe3.collides(car));
     }

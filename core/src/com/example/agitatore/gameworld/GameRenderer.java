@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.example.agitatore.TweenAccessors.Value;
@@ -44,17 +45,19 @@ public class GameRenderer {
     private Pipe pipe1, pipe2, pipe3;
 
     // Game Assets
-    private TextureRegion bg, grass;
+    private TextureAtlas.AtlasRegion bg, carMid, road, lightUp, lightDown, pipe,
+            lightRed, lightYellow, lightGreen, logoGame, ready, gameOver, highScore,
+            scoreboard,  retry;;
     private Animation carAnimation;
-    private TextureRegion carMid;
-    private TextureRegion tubeUp, tubeDown, tube;
+
 
     private TweenManager manager;
     private Value alpha = new Value();
 
     private List<SimpleButton> menuButtons;
+    private Color transitionColor;
 
-    public GameRenderer(GameWorld world, int gameHeight, int midPointY) { //gameHeight удалить?
+    public GameRenderer(GameWorld world, int gameHeight, int midPointY) {
         myWorld = world;
         this.midPointY = midPointY;
 
@@ -71,14 +74,9 @@ public class GameRenderer {
 
         initGameObjects();
         initAssets();
-        setupTweens();
-    }
 
-    private void setupTweens() {
-        Tween.registerAccessor(Value.class, new ValueAccessor());
-        manager = new TweenManager();
-        Tween.to(alpha, -1, .5f).target(0).ease(TweenEquations.easeOutQuad)
-                .start(manager);
+        transitionColor = new Color();
+        prepareTransition(255, 255, 255, .5f);
     }
 
     private void initGameObjects() {
@@ -93,66 +91,74 @@ public class GameRenderer {
 
     private void initAssets() {
         bg = AssetLoader.bg;
-        grass = AssetLoader.grass;
-        carAnimation = AssetLoader.carAnimation;
         carMid = AssetLoader.car;
-        tubeUp = AssetLoader.tubeUp;
-        tubeDown = AssetLoader.tubeDown;
-        tube = AssetLoader.tube;
+        road = AssetLoader.road;
+        lightUp = AssetLoader.lightUp;
+        lightDown = AssetLoader.lightDown;
+        pipe = AssetLoader.pipe;
+        lightRed = AssetLoader.lightRed;
+        lightYellow = AssetLoader.lightYellow;
+        lightGreen = AssetLoader.lightGreen;
+        logoGame = AssetLoader.logoGame;
+
+        carAnimation = AssetLoader.carAnimation;
+
+
+        ready = AssetLoader.ready;
+        gameOver = AssetLoader.gameOver;
+        highScore = AssetLoader.highScore;
+        scoreboard = AssetLoader.scoreboard;
+        retry = AssetLoader.retry;
     }
 
     public void render(float delta, float runTime) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Стартуем ShapeRenderer
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        // Отрисуем Background цвет
+        // draw sky
         shapeRenderer.setColor(149 / 255.0f, 233 / 255.0f, 252 / 255.0f, 1);
         shapeRenderer.rect(0, 0, 136, midPointY + 66);
 
-        /*// Отрисуем Grass
-        shapeRenderer.setColor(111 / 255.0f, 186 / 255.0f, 45 / 255.0f, 1);
-        shapeRenderer.rect(0, midPointY + 66, 136, 11);*/
-
-        // Отрисуем Dirt
+        // draw road
         shapeRenderer.setColor(158 / 255.0f, 146 / 255.0f, 141 / 255.0f, 1);
         shapeRenderer.rect(0, midPointY + 77, 136, 52);
 
-        // Заканчиваем ShapeRenderer
         shapeRenderer.end();
 
-        // Стартуем SpriteBatch
         batch.begin();
-        // Отменим прозрачность
-        // Это хорошо для производительности, когда отрисовываем картинки без прозрачности
+
         batch.disableBlending();
-        //batch.draw(bg, 0, midPointY + 23, 136, 43);
+        //batch.draw(bg, 0, midPointY + 6, 136, 60);
         batch.draw(bg, 0, midPointY + 6, 136, 60);
 
         drawGrass();
-
         drawPipes();
+
         batch.enableBlending();
 
-        drawSkulls();
+        drawLights();
 
         if (myWorld.isRunning()) {
             drawBird(runTime);
             drawScore();
         } else if (myWorld.isReady()) {
             drawBird(runTime);
-            drawScore();
+            drawReady();
         } else if (myWorld.isMenu()) {
             drawBirdCentered(runTime);
             drawMenuUI();
         } else if (myWorld.isGameOver()) {
+            drawScoreboard();
             drawBird(runTime);
-            drawScore();
+            drawGameOver();
+            drawRetry();
         } else if (myWorld.isHighScore()) {
+            drawScoreboard();
             drawBird(runTime);
-            drawScore();
+            drawHighScore();
+            drawRetry();
         }
 
         batch.end();
@@ -194,58 +200,46 @@ public class GameRenderer {
         shapeRenderer.rect(pipe3.getTubeDown().x, pipe3.getTubeDown().y,
                 pipe3.getTubeDown().width, pipe3.getTubeDown().height);
         shapeRenderer.end();*/
-
-        Gdx.app.log("GameRenderer", "render");
     }
 
     private void drawGrass() {
-        // отрисуем траву
-        batch.draw(grass, frontGrass.getPosition().x, frontGrass.getPosition().y,
+        batch.draw(road, frontGrass.getPosition().x, frontGrass.getPosition().y,
                 frontGrass.getWidth(), frontGrass.getHeight());
-        batch.draw(grass, backGrass.getPosition().x, backGrass.getPosition().y,
+        batch.draw(road, backGrass.getPosition().x, backGrass.getPosition().y,
                 backGrass.getWidth(), backGrass.getHeight());
     }
 
-    private void drawSkulls() {
-        // Временный код, извините за кашу :)
-        // Мы это починим, как только закончим с Pipe классом.
-
-        //batch.draw(tubeUp, pipe1.getPosition().x - 1,
-        //        pipe1.getPosition().y + pipe1.getHeight() - 14, 24, 14);
-        batch.draw(tubeUp, pipe1.getPosition().x - 5,
+    private void drawLights() {
+        batch.draw(lightUp, pipe1.getPosition().x - 5,
                 pipe1.getPosition().y + pipe1.getHeight() - 36, 28, 36);
-        batch.draw(tubeDown, pipe1.getPosition().x,
+        batch.draw(lightDown, pipe1.getPosition().x,
                 pipe1.getPosition().y + pipe1.getHeight() + 45, 18, 34);
-        //batch.draw(tubeDown, pipe1.getPosition().x - 1,
-        //        pipe1.getPosition().y + pipe1.getHeight() + 45, 24, 14);
 
-        batch.draw(tubeUp, pipe2.getPosition().x - 5,
+        batch.draw(lightUp, pipe2.getPosition().x - 5,
                 pipe2.getPosition().y + pipe2.getHeight() - 36, 28, 36);
-        batch.draw(tubeDown, pipe2.getPosition().x,
+        batch.draw(lightDown, pipe2.getPosition().x,
                 pipe2.getPosition().y + pipe2.getHeight() + 45, 18, 34);
 
-        batch.draw(tubeUp, pipe3.getPosition().x - 5,
+        batch.draw(lightUp, pipe3.getPosition().x - 5,
                 pipe3.getPosition().y + pipe3.getHeight() - 36, 28, 36);
-        batch.draw(tubeDown, pipe3.getPosition().x,
+        batch.draw(lightDown, pipe3.getPosition().x,
                 pipe3.getPosition().y + pipe3.getHeight() + 45, 18, 34);
     }
 
     private void drawPipes() {
-        // Временный код, извините за кашу :)
-        // Мы это починим, как только закончим с Pipe классом.
-        batch.draw(tube, pipe1.getPosition().x + 4, pipe1.getPosition().y, pipe1.getWidth(),
+        batch.draw(pipe, pipe1.getPosition().x + 4, pipe1.getPosition().y, pipe1.getWidth(),
                 pipe1.getHeight());
-        batch.draw(tube, pipe1.getPosition().x + 4, pipe1.getPosition().y + pipe1.getHeight() + 45,
+        batch.draw(pipe, pipe1.getPosition().x + 4, pipe1.getPosition().y + pipe1.getHeight() + 45,
                 pipe1.getWidth(), midPointY + 66 - (pipe1.getHeight() + 45));
 
-        batch.draw(tube, pipe2.getPosition().x + 4, pipe2.getPosition().y, pipe2.getWidth(),
+        batch.draw(pipe, pipe2.getPosition().x + 4, pipe2.getPosition().y, pipe2.getWidth(),
                 pipe2.getHeight());
-        batch.draw(tube, pipe2.getPosition().x + 4, pipe2.getPosition().y + pipe2.getHeight() + 45,
+        batch.draw(pipe, pipe2.getPosition().x + 4, pipe2.getPosition().y + pipe2.getHeight() + 45,
                 pipe2.getWidth(), midPointY + 66 - (pipe2.getHeight() + 45));
 
-        batch.draw(tube, pipe3.getPosition().x + 4, pipe3.getPosition().y, pipe3.getWidth(),
+        batch.draw(pipe, pipe3.getPosition().x + 4, pipe3.getPosition().y, pipe3.getWidth(),
                 pipe3.getHeight());
-        batch.draw(tube, pipe3.getPosition().x + 4, pipe3.getPosition().y + pipe3.getHeight() + 45,
+        batch.draw(pipe, pipe3.getPosition().x + 4, pipe3.getPosition().y + pipe3.getHeight() + 45,
                 pipe3.getWidth(), midPointY + 66 - (pipe3.getHeight() + 45));
     }
 
@@ -272,14 +266,78 @@ public class GameRenderer {
     }
 
     private void drawMenuUI() {
-        batch.draw(AssetLoader.fcLogo, 136 / 2 - 56, midPointY - 50,
-                AssetLoader.fcLogo.getRegionWidth() / 1.2f,
-                AssetLoader.fcLogo.getRegionHeight() / 1.2f);
+        batch.draw(logoGame, 136 / 2 - 56, midPointY - 50,
+                135 / 1.2f, 24 / 1.2f);
 
         for (SimpleButton button : menuButtons) {
             button.draw(batch);
         }
 
+    }
+
+    private void drawScoreboard() {
+        batch.draw(scoreboard, 22, midPointY - 30, 97, 37);
+
+        if (myWorld.getScore() > 60)
+            batch.draw(lightUp, 90, midPointY - 27, 24, 31);
+        else if (myWorld.getScore() > 30)
+            batch.draw(lightGreen, 90, midPointY - 27, 24, 31);
+        else if (myWorld.getScore() > 15)
+            batch.draw(lightYellow, 90, midPointY - 27, 24, 31);
+        else
+            batch.draw(lightRed, 90, midPointY - 27, 24, 31);
+
+
+
+        /*batch.draw(noStar, 25, midPointY - 15, 10, 10);
+        batch.draw(noStar, 37, midPointY - 15, 10, 10);
+        batch.draw(noStar, 49, midPointY - 15, 10, 10);
+        batch.draw(noStar, 61, midPointY - 15, 10, 10);
+        batch.draw(noStar, 73, midPointY - 15, 10, 10);
+
+        if (myWorld.getScore() > 2) {
+            batch.draw(star, 73, midPointY - 15, 10, 10);
+        }
+
+        if (myWorld.getScore() > 17) {
+            batch.draw(star, 61, midPointY - 15, 10, 10);
+        }
+
+        if (myWorld.getScore() > 50) {
+            batch.draw(star, 49, midPointY - 15, 10, 10);
+        }
+
+        if (myWorld.getScore() > 80) {
+            batch.draw(star, 37, midPointY - 15, 10, 10);
+        }
+
+        if (myWorld.getScore() > 120) {
+            batch.draw(star, 25, midPointY - 15, 10, 10);
+        }*/
+
+        int length = ("" + myWorld.getScore()).length();
+
+        AssetLoader.font.getData().setScale(.17f, -.17f);
+        AssetLoader.font.draw(batch, "" + myWorld.getScore(),
+                65 - (2 * length), midPointY - 27);
+
+        int length2 = ("" + AssetLoader.getHighScore()).length();
+        AssetLoader.font.draw(batch, "" + AssetLoader.getHighScore(),
+                65 - (2.5f * length2), midPointY - 7);
+        AssetLoader.font.getData().setScale(.25f, -.25f);
+
+    }
+
+    private void drawRetry() {
+        batch.draw(retry, 36, midPointY + 10, 66, 14);
+    }
+
+    private void drawReady() {
+        batch.draw(ready, 36, midPointY - 50, 68, 14);
+    }
+
+    private void drawGameOver() {
+        batch.draw(gameOver, 24, midPointY - 50, 92, 14);
     }
 
     private void drawScore() {
@@ -290,13 +348,27 @@ public class GameRenderer {
                 68 - (3 * length), midPointY - 83);
     }
 
+    private void drawHighScore() {
+        batch.draw(highScore, 22, midPointY - 50, 96, 14);
+    }
+
+    public void prepareTransition(int r, int g, int b, float duration) {
+        transitionColor.set(r / 255.0f, g / 255.0f, b / 255.0f, 1);
+        alpha.setValue(1);
+        Tween.registerAccessor(Value.class, new ValueAccessor());
+        manager = new TweenManager();
+        Tween.to(alpha, -1, duration).target(0)
+                .ease(TweenEquations.easeOutQuad).start(manager);
+    }
+
     private void drawTransition(float delta) {
         if (alpha.getValue() > 0) {
             manager.update(delta);
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(1, 1, 1, alpha.getValue());
+            shapeRenderer.setColor(transitionColor.r, transitionColor.g,
+                    transitionColor.b, alpha.getValue());
             shapeRenderer.rect(0, 0, 136, 300);
             shapeRenderer.end();
             Gdx.gl.glDisable(GL20.GL_BLEND);

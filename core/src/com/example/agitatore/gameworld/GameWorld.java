@@ -7,6 +7,7 @@ import com.example.agitatore.fchelpers.AssetLoader;
 import com.example.agitatore.gameobjects.Car;
 import com.example.agitatore.gameobjects.ScrollHandler;
 
+
 /**
  * Created by Agitatore on 19.02.2017.
  */
@@ -15,6 +16,7 @@ public class GameWorld {
 
     private Car car;
     private ScrollHandler scroller;
+    private GameRenderer renderer;
 
     private Rectangle ground;
 
@@ -29,7 +31,7 @@ public class GameWorld {
     }
 
     public GameWorld(int midPointY) {
-        currentState = GameState.READY;
+        currentState = GameState.MENU;
         this.midPointY = midPointY;
         //car = new Car(33, midPointY - 5, 17, 12);
         car = new Car(33, midPointY - 5, 17, 8);
@@ -70,13 +72,21 @@ public class GameWorld {
             scroller.stop();
             car.die();
             AssetLoader.dead.play();
+            renderer.prepareTransition(255, 255, 255, .3f);
+            AssetLoader.fall.play();
         }
 
         //if (Intersector.overlaps(car.getBoundingCircle(), ground)) {
         if (Intersector.overlaps(car.getBoundingCircle(), ground) &&
                 car.cleverCheck(midPointY + 66)) {
-            scroller.stop();
-            car.die();
+
+            if (car.isAlive()) {
+                AssetLoader.dead.play();
+                renderer.prepareTransition(255, 255, 255, .3f);
+                car.die();
+            }
+
+            scroller.stop();  //перенести в if?
             car.decelerate();
             currentState = GameState.GAMEOVER;
 
@@ -85,8 +95,6 @@ public class GameWorld {
                 currentState = GameState.HIGHSCORE;
             }
         }
-
-        Gdx.app.log("GameWorld", "updateRunning");
     }
 
     public void addScore(int increment) {
@@ -115,6 +123,7 @@ public class GameWorld {
 
     public void ready() {
         currentState = GameState.READY;
+        renderer.prepareTransition(0, 0, 0, 1f);
     }
 
     public void restart() {
@@ -123,6 +132,9 @@ public class GameWorld {
         car.onRestart(midPointY - 5);
         scroller.onRestart();
         currentState = GameState.READY;
+    }
+    public void setRenderer(GameRenderer renderer) {
+        this.renderer = renderer;
     }
 
     public int getMidPointY() {

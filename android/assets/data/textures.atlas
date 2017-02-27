@@ -1,0 +1,132 @@
+
+textures.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+background
+  rotate: false
+  xy: 2, 331
+  size: 621, 273
+  orig: 621, 273
+  offset: 0, 0
+  index: -1
+buttondown
+  rotate: false
+  xy: 572, 313
+  size: 29, 16
+  orig: 29, 16
+  offset: 0, 0
+  index: -1
+buttonup
+  rotate: false
+  xy: 683, 395
+  size: 29, 16
+  orig: 29, 16
+  offset: 0, 0
+  index: -1
+car
+  rotate: false
+  xy: 2, 115
+  size: 510, 214
+  orig: 510, 214
+  offset: 0, 0
+  index: -1
+fclogo
+  rotate: false
+  xy: 2, 606
+  size: 852, 188
+  orig: 852, 188
+  offset: 0, 0
+  index: -1
+gameover
+  rotate: false
+  xy: 514, 248
+  size: 46, 7
+  orig: 46, 7
+  offset: 0, 0
+  index: -1
+highscore
+  rotate: false
+  xy: 101, 106
+  size: 48, 7
+  orig: 48, 7
+  offset: 0, 0
+  index: -1
+light1
+  rotate: false
+  xy: 514, 257
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+light2
+  rotate: false
+  xy: 625, 413
+  size: 100, 191
+  orig: 100, 191
+  offset: 0, 0
+  index: -1
+lightgreen
+  rotate: false
+  xy: 625, 339
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+lightoff
+  rotate: false
+  xy: 727, 532
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+lightred
+  rotate: false
+  xy: 856, 709
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+lightyellow
+  rotate: false
+  xy: 2, 2
+  size: 56, 72
+  orig: 56, 72
+  offset: 0, 0
+  index: -1
+pipe
+  rotate: false
+  xy: 625, 334
+  size: 10, 3
+  orig: 10, 3
+  offset: 0, 0
+  index: -1
+ready
+  rotate: false
+  xy: 727, 523
+  size: 34, 7
+  orig: 34, 7
+  offset: 0, 0
+  index: -1
+retry
+  rotate: false
+  xy: 785, 597
+  size: 33, 7
+  orig: 33, 7
+  offset: 0, 0
+  index: -1
+road
+  rotate: false
+  xy: 856, 783
+  size: 165, 11
+  orig: 165, 11
+  offset: 0, 0
+  index: -1
+scoreboard
+  rotate: false
+  xy: 2, 76
+  size: 97, 37
+  orig: 97, 37
+  offset: 0, 0
+  index: -1

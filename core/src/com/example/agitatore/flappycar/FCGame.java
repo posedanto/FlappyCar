@@ -13,7 +13,6 @@ public class FCGame extends Game {
 	public void create() {
 		AssetLoader.load();
 		setScreen(new SplashScreen(this));
-		Gdx.app.log("Game", "created");
 	}
 
 	@Override
